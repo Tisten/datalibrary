@@ -45,5 +45,6 @@ jobs:
 
     - name: Run Tests with Valgrind
       run: |
-        /bin/bash ./local/bam/bam config=${{ matrix.config }} platform=linux_x86_64 compiler=${{ matrix.compiler }} test_valgrind
+        set PATH=$PATH:/home/linuxbrew/.linuxbrew/bin
+        ./local/bam/bam config=${{ matrix.config }} platform=linux_x86_64 compiler=${{ matrix.compiler }} test_valgrind
 

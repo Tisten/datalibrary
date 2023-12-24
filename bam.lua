@@ -296,7 +296,7 @@ else
 	local valgrind_flags = " -v --leak-check=full --track-origins=yes "
 
 	AddJob( "test",          "unittest c",        dl_tests .. test_args,                                 dl_tests,    "local/generated/unittest.bin" )
-	AddJob( "test_valgrind", "unittest valgrind", "/home/linuxbrew/.linuxbrew/bin/valgrind" .. valgrind_flags .. dl_tests .. test_args, dl_tests,    "local/generated/unittest.bin" )
+	AddJob( "test_valgrind", "unittest valgrind", "valgrind" .. valgrind_flags .. dl_tests .. test_args, dl_tests,    "local/generated/unittest.bin" )
 	AddJob( "test_gdb",      "unittest gdb",      "gdb --args " .. dl_tests .. test_args,                dl_tests,    "local/generated/unittest.bin" )
 
 	SkipOutputVerification("test")
