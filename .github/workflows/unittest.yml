@@ -30,6 +30,7 @@ jobs:
         eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
         sudo apt-get update
         sudo apt-get install build-essential
+        sudo apt-get install libc6-dbg
         brew install valgrind
         echo "Valgrind installed"
 
@@ -44,5 +45,5 @@ jobs:
 
     - name: Run Tests with Valgrind
       run: |
-        ./local/bam/bam config=${{ matrix.config }} platform=linux_x86_64 compiler=${{ matrix.compiler }} test_valgrind
+        /bin/bash ./local/bam/bam config=${{ matrix.config }} platform=linux_x86_64 compiler=${{ matrix.compiler }} test_valgrind
 
