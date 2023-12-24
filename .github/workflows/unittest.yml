@@ -25,8 +25,12 @@ jobs:
 
     - name: Install Valgrind
       run: |
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> ~/.bashrc
+        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
         sudo apt-get update
-        sudo apt install valgrind --fix-missing
+        sudo apt-get install build-essential
+        brew install valgrind
         echo "Valgrind installed"
 
     - name: Build project
