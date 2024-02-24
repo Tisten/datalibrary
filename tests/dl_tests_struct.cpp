@@ -131,6 +131,14 @@ static dl_error_t PatchPods4_PatchFunction( dl_ctx_t dl_ctx, void*, dl_patch_par
 	return DL_ERROR_TYPE_NOT_FOUND;
 }
 
+#include <generated/unittest2.h>
+
+template<typename T_from, typename T_to>
+bool SameIfCasted(T_from from, T_to to)
+{
+	return T_to(from) == to;
+}
+
 TEST_F(DL, struct_patch)
 {
 	dl_patch_func patch_func;
@@ -144,6 +152,9 @@ TEST_F(DL, struct_patch)
 	const char* text_data = STRINGIFY( { "PodsDefaults" : {} } );
 	unsigned char instance[1024];
 	EXPECT_DL_ERR_OK(dl_txt_pack(Ctx, text_data, instance, sizeof(instance), 0x0));
+	unsigned char unpacked_instance[1024];
+	EXPECT_DL_ERR_OK(dl_instance_load(Ctx, PodsDefaults_TYPE_ID, unpacked_instance, sizeof(unpacked_instance), instance, sizeof(instance), 0x0));
+	auto original_struct = (PodsDefaults*)unpacked_instance;
 
 	dl_ctx_t target_ctx;
 	dl_create_params_t p;
@@ -158,12 +169,51 @@ TEST_F(DL, struct_patch)
 	// Change order
 	patch_params.wanted_type = PatchPods1_TYPE_ID;
 	EXPECT_DL_ERR_OK(dl_instance_patch( target_ctx, &patch_params ));
+	{
+		auto patched_struct = (PatchPods1*)out_instance;
+		EXPECT_EQ(original_struct->i8,  patched_struct->i8);
+		EXPECT_EQ(original_struct->i16, patched_struct->i16);
+		EXPECT_EQ(original_struct->i32, patched_struct->i32);
+		EXPECT_EQ(original_struct->i64, patched_struct->i64);
+		EXPECT_EQ(original_struct->u8,  patched_struct->u8);
+		EXPECT_EQ(original_struct->u16, patched_struct->u16);
+		EXPECT_EQ(original_struct->u32, patched_struct->u32);
+		EXPECT_EQ(original_struct->u64, patched_struct->u64);
+		EXPECT_EQ(original_struct->f32, patched_struct->f32);
+		EXPECT_EQ(original_struct->f64, patched_struct->f64);
+	}
+
 	// Remove and add members
-	//patch_params.wanted_type = PatchPods2_TYPE_ID;
-	//EXPECT_DL_ERR_OK(dl_instance_patch( target_ctx, &patch_params ));
+	patch_params.wanted_type = PatchPods2_TYPE_ID;
+	EXPECT_DL_ERR_OK(dl_instance_patch( target_ctx, &patch_params ));
+	{
+		auto patched_struct = (PatchPods2*)out_instance;
+		EXPECT_EQ(original_struct->i8,  patched_struct->i8);
+		EXPECT_EQ(original_struct->i16, patched_struct->i16);
+		EXPECT_EQ(original_struct->i32, patched_struct->i32);
+		EXPECT_EQ(original_struct->u32, patched_struct->u32);
+		EXPECT_EQ(original_struct->u64, patched_struct->u64);
+		EXPECT_EQ(original_struct->f64, patched_struct->f64);
+		EXPECT_EQ(64.2, patched_struct->f64_2);
+	}
+
 	// Change types
 	patch_params.wanted_type = PatchPods3_TYPE_ID;
 	EXPECT_DL_ERR_OK(dl_instance_patch( target_ctx, &patch_params ));
+	{
+		auto patched_struct = (PatchPods3*)out_instance;
+		EXPECT_TRUE(SameIfCasted(original_struct->i8 , patched_struct->i8));
+		EXPECT_TRUE(SameIfCasted(original_struct->i16, patched_struct->i16));
+		EXPECT_TRUE(SameIfCasted(original_struct->i32, patched_struct->i32));
+		EXPECT_TRUE(SameIfCasted(original_struct->i64, patched_struct->i64));
+		EXPECT_TRUE(SameIfCasted(original_struct->u8 , patched_struct->u8));
+		EXPECT_TRUE(SameIfCasted(original_struct->u16, patched_struct->u16));
+		EXPECT_TRUE(SameIfCasted(original_struct->u32, patched_struct->u32));
+		EXPECT_TRUE(SameIfCasted(original_struct->u64, patched_struct->u64));
+		EXPECT_TRUE(SameIfCasted(original_struct->f32, patched_struct->f32));
+		EXPECT_TRUE(SameIfCasted(original_struct->f64, patched_struct->f64));
+	}
+
 	// Advanced type change
 	patch_params.wanted_type = PatchPods4_TYPE_ID;
 	EXPECT_DL_ERR_EQ(DL_ERROR_TYPE_NOT_FOUND, dl_instance_patch( target_ctx, &patch_params ));

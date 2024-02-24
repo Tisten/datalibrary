@@ -363,7 +363,7 @@ typedef dl_error_t (*dl_patch_func)( dl_ctx_t dl_ctx, void* patch_ctx, struct dl
 	    patch_func_count          - how many functions there are
 	    packed_instance_as_input  - 1 if the 'instance' is provided as packed data with a header, 0 if it is already unpacked
 	    packed_instance_as_output - 1 if the 'out_instance' should be written as packed data with a header, 0 if it should be unpacked
-	    input_type                - the type of the input data, can be 0 if 'packed_instance_as_input' is true
+	    input_type                - the type of the input data, only used if 'packed_instance_as_input' is false
 	    wanted_type               - the type to convert to, need to be known by the dl_ctx
 	    instance                  - the data which should be patched
 	    out_instance              - a pointer to a buffer where to store the out_instance. Run this function twice and check 'used_out_instance_size' to see the needed size
